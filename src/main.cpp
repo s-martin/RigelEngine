@@ -22,10 +22,10 @@
 #include "game_main.hpp"
 
 RIGEL_DISABLE_WARNINGS
+#include <SDL.h>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/program_options.hpp>
-#include <SDL.h>
+#include <clara.hpp>
 RIGEL_RESTORE_WARNINGS
 
 #include <iostream>
@@ -38,7 +38,6 @@ using namespace rigel::sdl_utils;
 using namespace std;
 
 namespace ba = boost::algorithm;
-namespace po = boost::program_options;
 
 
 namespace {
@@ -165,93 +164,76 @@ int main(int argc, char** argv) {
 
   string gamePath;
   GameOptions gameOptions;
-  bool disableMusic = false;
+  bool showHelp = false;
 
-  po::options_description optionsDescription("Options");
-  optionsDescription.add_options()
-    ("help,h", "Show command line help message")
-    ("skip-intro,s",
-     po::bool_switch(&gameOptions.mSkipIntro),
-     "Skip intro movies/Apogee logo, go straight to main menu")
-    ("play-level,l",
-     po::value<string>(),
-     "Directly jump to given map, skipping intro/menu etc.")
-    ("no-music",
-     po::bool_switch(&disableMusic),
-     "Disable music playback")
-    ("player-pos",
-     po::value<string>(),
-     "Specify position to place the player at (to be used in conjunction with\n"
-     "'play-level')")
-    ("game-path",
-     po::value<string>(&gamePath),
-     "Path to original game's installation. Can also be given as positional "
-     "argument.");
+  auto parseLevelToPlay = [&gameOptions](const string& levelToPlay) {
+    if (levelToPlay.size() != 2) {
+      throw invalid_argument("Invalid level name");
+    }
 
-  po::positional_options_description positionalArgsDescription;
-  positionalArgsDescription.add("game-path", -1);
+    const auto episode = static_cast<int>(levelToPlay[0] - 'L');
+    const auto level = static_cast<int>(levelToPlay[1] - '0') - 1;
+
+    if (episode < 0 || episode >= 4 || level < 0 || level >= 8) {
+      throw invalid_argument(string("Invalid level name: ") + levelToPlay);
+    }
+
+    gameOptions.mLevelToJumpTo = std::make_pair(episode, level);
+  };
+
+  auto parsePlayerPos = [&gameOptions](const string& playerPosString) {
+    std::vector<std::string> positionParts;
+    ba::split(positionParts, playerPosString, ba::is_any_of(","));
+
+    if (
+      positionParts.size() != 2 ||
+      positionParts[0].empty() ||
+      positionParts[1].empty()
+    ) {
+      throw invalid_argument(
+        "Invalid x/y-position (specify using '<X>,<Y>')");
+    }
+
+    const auto position = base::Vector{
+      std::stoi(positionParts[0]),
+      std::stoi(positionParts[1])
+    };
+    gameOptions.mPlayerPosition = position;
+  };
+
+  using namespace clara;
+  auto commandLineParser
+    = Help(showHelp)
+    + Opt(gameOptions.mSkipIntro, "skip-intro")
+      ["-s"]["--skip-intro"]
+      ("Skip intro movies/Apogee logo, go straight to main menu")
+    + Opt([&parseLevelToPlay](const string& l) { parseLevelToPlay(l); }, "play-level")
+      ["-p"]["--play-level"]
+      ("Directly jump to given map, skipping intro/menu etc.")
+    + Opt([&gameOptions](const bool disableMusic) { gameOptions.mEnableMusic = !disableMusic;}, "no-music")
+      ["--no-music"]
+      ("Disable music playback")
+    + Opt([&parsePlayerPos](const string& p) { parsePlayerPos(p); }, "player-pos")
+    //+ Opt(parsePlayerPos, "player-pos")
+      ["--player-pos"]
+      ("Specify position to place the player at (to be used in conjunction with"
+      "\n'play-level')")
+    + Arg(gamePath, "game-path")
+      ("Path to original game's installation. Can also be given as positional "
+      "argument.");
 
   try
   {
-    po::variables_map options;
-    po::store(
-      po::command_line_parser(argc, argv)
-        .options(optionsDescription)
-        .positional(positionalArgsDescription)
-        .run(),
-      options);
-    po::notify(options);
-
-    if (options.count("help")) {
-      cout << optionsDescription << '\n';
+    const auto result = commandLineParser.parse(Args(argc, argv));
+    if (!result) {
+      std::cerr << result.errorMessage() << '\n';
+    }
+    if (showHelp) {
+      cout << commandLineParser << '\n';
       return 0;
     }
 
-    if (disableMusic) {
-      gameOptions.mEnableMusic = false;
-    }
-
-    if (options.count("play-level")) {
-      const auto levelToPlay = options["play-level"].as<string>();
-      if (levelToPlay.size() != 2) {
-        throw invalid_argument("Invalid level name");
-      }
-
-      const auto episode = static_cast<int>(levelToPlay[0] - 'L');
-      const auto level = static_cast<int>(levelToPlay[1] - '0') - 1;
-
-      if (episode < 0 || episode >= 4 || level < 0 || level >= 8) {
-        throw invalid_argument(string("Invalid level name: ") + levelToPlay);
-      }
-
-      gameOptions.mLevelToJumpTo = std::make_pair(episode, level);
-    }
-
-    if (options.count("player-pos")) {
-      if (!options.count("play-level")) {
-        throw invalid_argument(
-          "This option requires also using the play-level option");
-      }
-
-      const auto playerPosString = options["player-pos"].as<string>();
-      std::vector<std::string> positionParts;
-      ba::split(positionParts, playerPosString, ba::is_any_of(","));
-
-      if (
-        positionParts.size() != 2 ||
-        positionParts[0].empty() ||
-        positionParts[1].empty()
-      ) {
-        throw invalid_argument(
-          "Invalid x/y-position (specify using '<X>,<Y>')");
-      }
-
-      const auto position = base::Vector{
-        std::stoi(positionParts[0]),
-        std::stoi(positionParts[1])
-      };
-      gameOptions.mPlayerPosition = position;
-    }
+    cout << gamePath << "P\n";
 
     if (!gamePath.empty() && gamePath.back() != '/') {
       gamePath += "/";
@@ -259,10 +241,10 @@ int main(int argc, char** argv) {
 
     initAndRunGame(gamePath, gameOptions);
   }
-  catch (const po::error& err)
+  catch (const std::invalid_argument& err)
   {
     cerr << "ERROR: " << err.what() << "\n\n";
-    cerr << optionsDescription << '\n';
+    cerr << commandLineParser << '\n';
     return -1;
   }
   catch (const std::exception& ex)

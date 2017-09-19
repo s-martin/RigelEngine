@@ -231,6 +231,10 @@ set(main_exe_sources
 
 
 add_executable(${main_exe_name} ${main_exe_sources})
+target_include_directories(${main_exe_name}
+    PRIVATE
+    ${3rd_party_path}/clara
+)
 target_link_libraries(${main_exe_name} PRIVATE
     ${SDLMAIN2_LIBRARY}
     rigel_core
