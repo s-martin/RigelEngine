@@ -45,6 +45,10 @@ void TextureBase::setColorMod(
   mModulation.b = std::uint8_t(blue);
 }
 
+void TextureBase::enableModulation(const bool enable) {
+  mEnableModulation = enable;
+}
+
 
 void TextureBase::render(
   engine::Renderer* renderer,
@@ -81,7 +85,11 @@ void TextureBase::renderScaled(
   engine::Renderer* pRenderer,
   const base::Rect<int>& destRect
 ) const {
-  pRenderer->drawTexture(mData, completeSourceRect(), destRect, mModulation);
+  if (mEnableModulation) {
+    pRenderer->drawTexture(mData, completeSourceRect(), destRect, mModulation);
+  } else {
+    pRenderer->drawTextureFast(mData, completeSourceRect(), destRect);
+  }
 }
 
 
@@ -100,11 +108,16 @@ void TextureBase::render(
     {x, y},
     {sourceRect.size.width, sourceRect.size.height}
   };
-  pRenderer->drawTexture(
-    mData,
-    sourceRect,
-    destRect,
-    mModulation);
+
+  if (mEnableModulation) {
+    pRenderer->drawTexture(
+      mData,
+      sourceRect,
+      destRect,
+      mModulation);
+  } else {
+    pRenderer->drawTextureFast(mData, sourceRect, destRect);
+  }
 }
 
 

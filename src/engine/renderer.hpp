@@ -98,6 +98,15 @@ public:
     const base::Rect<int>& pDestRect,
     const base::Color& colorModulation);
 
+  /** Draw texture without color modulation
+   *
+   * This ignores the global overlay color.
+   */
+  void drawTextureFast(
+    const TextureData& textureData,
+    const base::Rect<int>& pSourceRect,
+    const base::Rect<int>& pDestRect);
+
   void drawRectangle(
     const base::Rect<int>& rect,
     const base::Color& color);
@@ -159,6 +168,7 @@ private:
 
   enum class RenderMode {
     SpriteBatch,
+    SpriteBatchFast,
     NonTexturedRender,
     Points
   };
@@ -175,6 +185,11 @@ private:
     GLsizei height,
     const GLvoid* const pData);
 
+  void pushTexturedQuad(
+    const TextureData& textureData,
+    const base::Rect<int>& pSourceRect,
+    const base::Rect<int>& pDestRect);
+
 private:
   SDL_Window* mpWindow;
 
@@ -183,6 +198,7 @@ private:
   GLuint mStreamEbo;
 
   Shader mTexturedQuadShader;
+  Shader mFastTexturedQuadShader;
   Shader mSolidColorShader;
 
   GLuint mLastUsedShader;

@@ -115,6 +115,18 @@ void main() {
 }
 )shd";
 
+const auto FAST_FRAGMENT_SOURCE = R"shd(
+OUTPUT_COLOR_DECLARATION
+
+IN vec2 texCoordFrag;
+
+uniform sampler2D textureData;
+
+void main() {
+  OUTPUT_COLOR = TEXTURE_LOOKUP(textureData, texCoordFrag);
+}
+)shd";
+
 const auto VERTEX_SOURCE_SOLID = R"shd(
 ATTRIBUTE vec2 position;
 ATTRIBUTE vec4 color;
@@ -188,6 +200,11 @@ Renderer::Renderer(SDL_Window* pWindow)
       VERTEX_SOURCE,
       FRAGMENT_SOURCE,
       {"position", "texCoord"})
+  , mFastTexturedQuadShader(
+      SHADER_PREAMBLE,
+      VERTEX_SOURCE,
+      FAST_FRAGMENT_SOURCE,
+      {"position", "texCoord"})
   , mSolidColorShader(
       SHADER_PREAMBLE,
       VERTEX_SOURCE_SOLID,
@@ -213,7 +230,9 @@ Renderer::Renderer(SDL_Window* pWindow)
   glGenBuffers(1, &mStreamEbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mStreamEbo);
 
-  // One-time setup for textured quad shader
+  // One-time setup for textured quad shaders
+  useShaderIfChanged(mFastTexturedQuadShader);
+  mFastTexturedQuadShader.setUniform("textureData", 0);
   useShaderIfChanged(mTexturedQuadShader);
   mTexturedQuadShader.setUniform("textureData", 0);
 
@@ -260,19 +279,39 @@ void Renderer::drawTexture(
   setRenderModeIfChanged(RenderMode::SpriteBatch);
 
   const auto colorModulationChanged = colorModulation != mLastColorModulation;
-  const auto textureChanged = textureData.mHandle != mLastUsedTexture;
-
-  if (colorModulationChanged || textureChanged) {
-    submitBatch();
-  }
-
   if (colorModulationChanged) {
+    submitBatch();
     mTexturedQuadShader.setUniform(
       "colorModulation", toGlColor(colorModulation));
     mLastColorModulation = colorModulation;
   }
 
+  pushTexturedQuad(textureData, sourceRect, destRect);
+}
+
+
+void Renderer::drawTextureFast(
+  const TextureData& textureData,
+  const base::Rect<int>& sourceRect,
+  const base::Rect<int>& destRect
+) {
+  if (!isVisible(destRect)) {
+    return;
+  }
+
+  setRenderModeIfChanged(RenderMode::SpriteBatchFast);
+  pushTexturedQuad(textureData, sourceRect, destRect);
+}
+
+
+void Renderer::pushTexturedQuad(
+  const TextureData& textureData,
+  const base::Rect<int>& sourceRect,
+  const base::Rect<int>& destRect
+) {
+  const auto textureChanged = textureData.mHandle != mLastUsedTexture;
   if (textureChanged) {
+    submitBatch();
     glBindTexture(GL_TEXTURE_2D, textureData.mHandle);
     mLastUsedTexture = textureData.mHandle;
   }
@@ -330,6 +369,7 @@ void Renderer::submitBatch() {
   }
 
   switch (mRenderMode) {
+    case RenderMode::SpriteBatchFast:
     case RenderMode::SpriteBatch:
       glBufferData(
         GL_ARRAY_BUFFER,
@@ -500,7 +540,11 @@ void Renderer::setRenderMode(const RenderMode mode) {
 
   switch (mode) {
     case RenderMode::SpriteBatch:
-      useShaderIfChanged(mTexturedQuadShader);
+    case RenderMode::SpriteBatchFast:
+      useShaderIfChanged(
+        mode == RenderMode::SpriteBatchFast
+        ? mFastTexturedQuadShader
+        : mTexturedQuadShader);
       glVertexAttribPointer(
         0,
         2,
@@ -661,6 +705,8 @@ void Renderer::onRenderTargetChanged() {
   // one when switching render mode.
   useShaderIfChanged(mTexturedQuadShader);
   mTexturedQuadShader.setUniform("transform", mProjectionMatrix);
+  useShaderIfChanged(mFastTexturedQuadShader);
+  mFastTexturedQuadShader.setUniform("transform", mProjectionMatrix);
   useShaderIfChanged(mSolidColorShader);
   mSolidColorShader.setUniform("transform", mProjectionMatrix);
 

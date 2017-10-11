@@ -33,6 +33,11 @@ TileRenderer::TileRenderer(OwningTexture&& tileSet, Renderer* pRenderer)
 }
 
 
+void TileRenderer::enableModulation(const bool enable) {
+  mTileSetTexture.enableModulation(enable);
+}
+
+
 void TileRenderer::renderTile(
   const int index,
   const int x,

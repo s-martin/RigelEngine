@@ -82,9 +82,9 @@ void Game::run(const GameOptions& options) {
 
   engine::initGlobalTimer();
 
-  data::forEachSoundId([this](const auto id) {
-    mSoundsById.emplace_back(mSoundSystem.addSound(mResources.loadSound(id)));
-  });
+  //data::forEachSoundId([this](const auto id) {
+    //mSoundsById.emplace_back(mSoundSystem.addSound(mResources.loadSound(id)));
+  //});
 
   mMusicEnabled = options.mEnableMusic;
 
@@ -143,6 +143,11 @@ void Game::mainLoop() {
 
   SDL_Event event;
   mLastTime = high_resolution_clock::now();
+
+  {
+    RenderTargetBinder bindRenderTarget(mRenderTarget, &mRenderer);
+    mRenderer.clear();
+  }
 
   for (;;) {
     const auto startOfFrame = high_resolution_clock::now();
@@ -278,11 +283,11 @@ void Game::fadeInScreen() {
 
 
 void Game::playSound(const data::SoundId id) {
-  const auto index = static_cast<std::size_t>(id);
-  assert(index < mSoundsById.size());
+  //const auto index = static_cast<std::size_t>(id);
+  //assert(index < mSoundsById.size());
 
-  const auto handle = mSoundsById[index];
-  mSoundSystem.playSound(handle);
+  //const auto handle = mSoundsById[index];
+  //mSoundSystem.playSound(handle);
 }
 
 

@@ -61,9 +61,13 @@ MapRenderer::MapRenderer(
   , mBackdropTexture(mpRenderer, renderData.mBackdropImage)
   , mScrollMode(renderData.mBackdropScrollMode)
 {
+  mTileRenderer.enableModulation(false);
+  mBackdropTexture.enableModulation(false);
+
   if (renderData.mSecondaryBackdropImage) {
     mAlternativeBackdropTexture = engine::OwningTexture(
       mpRenderer, *renderData.mSecondaryBackdropImage);
+    mAlternativeBackdropTexture.enableModulation(false);
   }
 }
 

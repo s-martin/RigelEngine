@@ -65,6 +65,8 @@ public:
 
   void setColorMod(int r, int g, int b);
 
+  void enableModulation(bool enable);
+
   int width() const {
     return mData.mWidth;
   }
@@ -96,6 +98,7 @@ protected:
 
   Renderer::TextureData mData;
   base::Color mModulation;
+  bool mEnableModulation = true;
 };
 
 }
