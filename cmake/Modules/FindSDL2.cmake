@@ -375,12 +375,7 @@ if(SDL2_FOUND)
     endif()
 
 
-    if(APPLE)
-      # For OS X, SDL2 uses Cocoa as a backend so it must link to Cocoa.
-      # For more details, please see above.
-      set_property(TARGET SDL2::Core APPEND PROPERTY
-                   INTERFACE_LINK_OPTIONS "-framework Cocoa")
-    elseif(NOT MSVC)
+    if(NOT APPLE AND NOT MSVC)
       # For threads, as mentioned Apple doesn't need this.
       # For more details, please see above.
       set_property(TARGET SDL2::Core APPEND PROPERTY
