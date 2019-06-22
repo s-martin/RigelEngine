@@ -19,13 +19,7 @@
 #include <algorithm>
 
 
-namespace rigel { namespace base {
-
-template<typename T>
-T clamp(const T value, const T minValue, const T maxValue) {
-  return std::clamp(value, minValue, maxValue);
-}
-
+namespace rigel::base {
 
 template<typename T>
 T integerDivCeil(const T value, const T divisor) {
@@ -44,4 +38,4 @@ bool inRange(const T value, const T min, const T max) {
   return value >= min && value <= max;
 }
 
-}}
+}

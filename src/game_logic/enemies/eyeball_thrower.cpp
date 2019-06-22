@@ -24,7 +24,7 @@
 #include "game_logic/player.hpp"
 
 
-namespace rigel { namespace game_logic { namespace behaviors {
+namespace rigel::game_logic::behaviors {
 
 namespace {
 
@@ -77,7 +77,7 @@ void EyeballThrower::update(
 
     spawnMovingEffectSprite(
       *d.mpEntityFactory,
-      100,
+      data::ActorID::Eyeball_projectile,
       movement,
       position + base::Vector{offsetX, -6});
   };
@@ -137,4 +137,4 @@ void EyeballThrower::update(
   );
 }
 
-}}}
+}

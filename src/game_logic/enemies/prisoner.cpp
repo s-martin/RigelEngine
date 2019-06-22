@@ -26,7 +26,7 @@
 #include "game_logic/entity_factory.hpp"
 
 
-namespace rigel { namespace game_logic { namespace ai {
+namespace rigel::game_logic::ai {
 
 using engine::components::Sprite;
 using engine::components::WorldPosition;
@@ -161,7 +161,7 @@ void PrisonerSystem::receive(const events::ShootableKilled& event) {
   const auto debrisMovement = shotFromLeft
     ? SpriteMovement::FlyUpperRight
     : SpriteMovement::FlyUpperLeft;
-  spawnMovingEffectSprite(*mpEntityFactory, 255, debrisMovement, position);
+  spawnMovingEffectSprite(*mpEntityFactory, data::ActorID::Prisoner_hand_debris, debrisMovement, position);
 
   mpParticles->spawnParticles(
     position + base::Vector{3, 0},
@@ -170,4 +170,4 @@ void PrisonerSystem::receive(const events::ShootableKilled& event) {
   mpServiceProvider->playSound(data::SoundId::BiologicalEnemyDestroyed);
 }
 
-}}}
+}

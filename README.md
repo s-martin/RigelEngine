@@ -10,7 +10,8 @@ projects like [Omnispeak](https://davidgow.net/keen/omnispeak.html) or [Commande
 thing for the Commander Keen series of games.
 
 There was never any source code released for the original game, so this project
-is based on reverse-engineering: A mix of reading assembly and analyzing video captures from DosBox.
+is based on reverse-engineering the original executable's assembly code. Video captures from DosBox are used to verify re-implemented behavior.
+See [my blog post](https://lethalguitar.wordpress.com/2019/05/28/re-implementing-an-old-dos-game-in-c-17/) to learn more about the process.
 
 Here's a video showcasing the project:
 
@@ -70,6 +71,10 @@ The most important command line options are:
 * `-s`: skip intro movies, go straight to main menu
 * `--no-music`: don't play music
 * `-h`/`--help`: show all command line options
+
+### Debugging tools, more info
+
+You can find more info that didn't quite fit in this README over on [the Wiki](https://github.com/lethal-guitar/RigelEngine/wiki). For example, you'll find info on how to activate the built-in debugging tools, a list of bugs in the original version that have been fixed in Rigel Engine, etc.
 
 ## Getting binaries
 
@@ -197,7 +202,7 @@ For getting the dependencies, I strongly recommend using
 
 
 ```bash
-vcpkg install boost-program-options:x64-windows boost-algorithm:x64-windows sdl2:x64-windows sdl2-mixer:x64-windows
+vcpkg install boost-program-options:x64-windows boost-algorithm:x64-windows sdl2:x64-windows sdl2-mixer:x64-windows --triplet x64-windows
 ```
 
 Then pass `CMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkgdir/scripts/buildystems/vcpkg.cmake` when invoking CMake.
@@ -210,7 +215,7 @@ mkdir build
 cd build
 
 # Remember to replace <vcpkg_root> with the path to where you installed vcpkg!
-cmake .. -DWARNINGS_AS_ERRORS=OFF -DCMAKE_TOOLCHAIN_FILE=<vcpkg_root>/scripts/buildystems/vcpkg.cmake
+cmake .. -DWARNINGS_AS_ERRORS=OFF -DCMAKE_TOOLCHAIN_FILE=<vckpkg_root>/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_GENERATOR_PLATFORM=x64
 
 # This will open the generated Visual Studio solution
 start RigelEngine.sln

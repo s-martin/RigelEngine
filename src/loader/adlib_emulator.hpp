@@ -16,8 +16,6 @@
 
 #pragma once
 
-#include "base/math_tools.hpp"
-
 #include <dbopl.h>
 
 #include <algorithm>
@@ -25,7 +23,7 @@
 #include <cstdint>
 
 
-namespace rigel { namespace loader {
+namespace rigel::loader {
 
 class AdlibEmulator {
 public:
@@ -63,7 +61,7 @@ public:
         destination,
         [volumeScale](const auto sample32Bit) {
           return static_cast<std::int16_t>(
-            base::clamp(sample32Bit * volumeScale, -16384, 16384));
+            std::clamp(sample32Bit * volumeScale, -16384, 16384));
         });
 
       numSamples -= samplesForIteration;
@@ -75,4 +73,4 @@ private:
   std::array<std::int32_t, 256> mTempBuffer;
 };
 
-}}
+}

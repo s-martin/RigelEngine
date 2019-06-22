@@ -16,10 +16,10 @@
 
 #include "voc_decoder.hpp"
 
-#include "base/math_tools.hpp"
 #include "base/warnings.hpp"
 #include "loader/file_utils.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <iterator>
@@ -40,7 +40,7 @@
  *   https://www.ffmpeg.org/doxygen/2.4/adpcm_8c_source.html#l00295
  */
 
-namespace rigel { namespace loader {
+namespace rigel::loader {
 
 using namespace std;
 
@@ -188,7 +188,7 @@ public:
       difference = -difference;
     }
 
-    const auto newSample = base::clamp(
+    const auto newSample = std::clamp(
       mPrediction + difference, -16384, 16384);
     mPrediction = newSample;
 
@@ -371,4 +371,4 @@ data::AudioBuffer decodeVoc(const ByteBuffer& data) {
 }
 
 
-}}
+}

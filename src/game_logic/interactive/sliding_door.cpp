@@ -16,7 +16,6 @@
 
 #include "sliding_door.hpp"
 
-#include "base/math_tools.hpp"
 #include "common/game_service_provider.hpp"
 #include "data/game_traits.hpp"
 #include "data/unit_conversions.hpp"
@@ -24,8 +23,10 @@
 #include "engine/entity_tools.hpp"
 #include "engine/physical_components.hpp"
 
+#include <algorithm>
 
-namespace rigel { namespace game_logic { namespace ai {
+
+namespace rigel::game_logic { namespace ai {
 
 using engine::components::Sprite;
 using engine::components::WorldPosition;
@@ -213,7 +214,7 @@ void SlidingDoorSystem::update(entityx::EntityManager& es) {
       state.mState = vertical::nextState(state, inRange);
 
       const auto stepChange = vertical::stepChangeForState(state.mState);
-      state.mSlideStep = base::clamp(state.mSlideStep + stepChange, 0, 7);
+      state.mSlideStep = std::clamp(state.mSlideStep + stepChange, 0, 7);
 
       if (state.mState == vertical::State::Closed) {
         boundingBox.topLeft.y = 0;
@@ -264,4 +265,4 @@ void renderVerticalSlidingDoor(
   }
 }
 
-}}
+}

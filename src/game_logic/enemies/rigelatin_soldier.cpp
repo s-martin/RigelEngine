@@ -17,7 +17,6 @@
 #include "rigelatin_soldier.hpp"
 
 #include "base/match.hpp"
-#include "base/math_tools.hpp"
 #include "engine/base_components.hpp"
 #include "engine/random_number_generator.hpp"
 #include "engine/physical_components.hpp"
@@ -26,8 +25,10 @@
 #include "game_logic/entity_factory.hpp"
 #include "game_logic/player.hpp"
 
+#include <algorithm>
 
-namespace rigel { namespace game_logic { namespace behaviors {
+
+namespace rigel::game_logic::behaviors {
 
 namespace {
 
@@ -159,7 +160,7 @@ void RigelatinSoldier::updateReadyState(
     const auto xOffset = facingLeft ? 0 : 4;
 
     auto projectile = spawnMovingEffectSprite(
-      *d.mpEntityFactory, 300, movement, position + base::Vector{xOffset, -4});
+      *d.mpEntityFactory, data::ActorID::Rigelatin_soldier_projectile, movement, position + base::Vector{xOffset, -4});
     projectile.assign<components::PlayerDamaging>(1);
 
     animationFrame = 3;
@@ -189,7 +190,7 @@ void RigelatinSoldier::updateReadyState(
     if (mDecisionCounter > 0 && mDecisionCounter < 6) {
       jump();
     } else {
-      mDecisionCounter = base::clamp(mDecisionCounter, 1, 5);
+      mDecisionCounter = std::clamp(mDecisionCounter, 1, 5);
 
       if (d.mpRandomGenerator->gen() % 2 != 0) {
         attack();
@@ -197,4 +198,4 @@ void RigelatinSoldier::updateReadyState(
     }
   }
 }
-}}}
+}

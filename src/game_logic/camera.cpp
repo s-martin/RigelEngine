@@ -16,17 +16,18 @@
 
 #include "camera.hpp"
 
-#include "base/math_tools.hpp"
 #include "common/global.hpp"
 #include "data/game_traits.hpp"
 #include "data/map.hpp"
 #include "engine/physical_components.hpp"
 #include "game_logic/player.hpp"
 
+#include <algorithm>
+
 namespace ex = entityx;
 
 
-namespace rigel { namespace game_logic {
+namespace rigel::game_logic {
 
 namespace {
 
@@ -169,8 +170,8 @@ void Camera::updateAutomaticScrolling() {
 
 
 void Camera::setPosition(const base::Vector position) {
-  mPosition.x = base::clamp(position.x, 0, mMaxPosition.width);
-  mPosition.y = base::clamp(position.y, 0, mMaxPosition.height);
+  mPosition.x = std::clamp(position.x, 0, mMaxPosition.width);
+  mPosition.y = std::clamp(position.y, 0, mMaxPosition.height);
 }
 
 
@@ -183,4 +184,4 @@ void Camera::receive(const rigel::events::PlayerFiredShot& event) {
   mManualScrollCooldown = MANUAL_SROLL_COOLDOWN_AFTER_SHOOTING;
 }
 
-}}
+}

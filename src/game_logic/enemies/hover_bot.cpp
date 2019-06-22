@@ -25,7 +25,7 @@
 #include "game_logic/entity_factory.hpp"
 
 
-namespace rigel { namespace game_logic { namespace ai {
+namespace rigel::game_logic::ai {
 
 using namespace components::detail;
 using namespace engine::components;
@@ -70,7 +70,7 @@ void HoverBotSystem::update(entityx::EntityManager& es) {
         if (state.mNextSpawnCountdown == SPAWN_DELAY) {
           state.mNextSpawnCountdown = 0;
           auto robot =
-            mpEntityFactory->createActor(0, position + BOT_SPAWN_OFFSET);
+            mpEntityFactory->createActor(rigel::data::ActorID::Hoverbot, position + BOT_SPAWN_OFFSET);
           robot.assign<Active>();
         }
       }
@@ -165,4 +165,4 @@ void HoverBotSystem::updateReorientation(
   }
 }
 
-}}}
+}

@@ -26,7 +26,7 @@
 #include "game_logic/entity_factory.hpp"
 
 
-namespace rigel { namespace game_logic { namespace ai {
+namespace rigel::game_logic::ai {
 
 using namespace engine::components;
 using namespace engine::orientation;
@@ -186,7 +186,7 @@ void SpiderSystem::update(entityx::EntityManager& es) {
         const auto movementType = mpRandomGenerator->gen() % 2 != 0
           ? M::FlyUpperLeft
           : M::FlyUpperRight;
-        spawnMovingEffectSprite(*mpEntityFactory, 232, movementType, position);
+        spawnMovingEffectSprite(*mpEntityFactory, data::ActorID::Spider_shaken_off, movementType, position);
         detachAndDestroy();
       };
 
@@ -292,4 +292,4 @@ void SpiderSystem::receive(const engine::events::CollidedWithWorld& event) {
   }
 }
 
-}}}
+}

@@ -30,7 +30,7 @@
 #include "game_logic/global_dependencies.hpp"
 
 
-namespace rigel { namespace game_logic {
+namespace rigel::game_logic {
 
 using engine::components::Active;
 using engine::components::BoundingBox;
@@ -212,7 +212,7 @@ void NapalmBomb::spawnFires(
         BoundingBox{{}, {2, 1}});
 
     if (canSpawn) {
-      auto fire = spawnOneShotSprite(*d.mpEntityFactory, 65, position);
+      auto fire = spawnOneShotSprite(*d.mpEntityFactory, data::ActorID::Fire_bomb_fire, position);
       fire.assign<components::PlayerDamaging>(Damage{1});
       fire.assign<components::DamageInflicting>(
         Damage{1},
@@ -231,4 +231,4 @@ void NapalmBomb::spawnFires(
   }
 }
 
-}}}
+}}

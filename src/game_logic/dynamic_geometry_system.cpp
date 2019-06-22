@@ -33,7 +33,7 @@
 #include "game_logic/entity_factory.hpp"
 
 
-namespace rigel { namespace game_logic {
+namespace rigel::game_logic {
 
 using game_logic::components::MapGeometryLink;
 
@@ -298,7 +298,10 @@ void behaviors::DynamicGeometryController::update(
     const auto offset = d.mpRandomGenerator->gen() % mapSection.size.width;
     const auto spawnPosition =
       base::Vector{mapSection.left() + offset, mapSection.bottom() + 1};
-    spawnFloatingOneShotSprite(*d.mpEntityFactory, 3, spawnPosition);
+    spawnFloatingOneShotSprite(
+      *d.mpEntityFactory,
+      data::ActorID::Shot_impact_FX,
+      spawnPosition);
   };
 
   auto sink = [&]() {
@@ -503,4 +506,4 @@ void behaviors::DynamicGeometryController::update(
   }
 }
 
-}}
+}

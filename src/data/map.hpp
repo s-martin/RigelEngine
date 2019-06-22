@@ -17,6 +17,7 @@
 #pragma once
 
 #include "base/spatial_types.hpp"
+#include "data/actor_ids.hpp"
 #include "data/tile_attributes.hpp"
 
 #include <array>
@@ -26,12 +27,7 @@
 #include <vector>
 
 
-namespace rigel { namespace data {
-
-using ActorID = std::uint16_t;
-
-
-namespace map {
+namespace rigel::data::map {
 
 enum class BackdropScrollMode {
   None,
@@ -111,4 +107,4 @@ struct LevelData {
 
 using ActorDescriptionList = std::vector<LevelData::Actor>;
 
-}}}
+}

@@ -29,7 +29,7 @@
 #include "game_logic/player.hpp"
 
 
-namespace rigel { namespace game_logic { namespace ai {
+namespace rigel::game_logic::ai {
 
 using namespace engine::components;
 using namespace engine::orientation;
@@ -113,7 +113,7 @@ void SlimeBlobSystem::update(entityx::EntityManager& es) {
           entity.remove<BoundingBox>();
           entity.remove<Active>();
 
-          mpEntityFactory->createActor(67, position + SLIME_BLOB_SPAWN_OFFSET);
+          mpEntityFactory->createActor(rigel::data::ActorID::Green_slime_blob, position + SLIME_BLOB_SPAWN_OFFSET);
         }
 
         const auto visibleFrame =
@@ -307,4 +307,4 @@ void SlimeBlobSystem::receive(const events::ShootableKilled& event) {
   sprite.flashWhite();
 }
 
-}}}
+}
